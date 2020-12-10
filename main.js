@@ -58,9 +58,11 @@ OFFSET ${(page - 1) * perPage}`
 
 
 
-app.get('/res/:id', (req, res) => {
+app.get('/restaurants/:id', (req, res) => {
     let id = req.params.id
-    sql = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM 'restaurant_table' WHERE id = ${id}`
+    sql = `
+SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM 'restaurant_table'
+WHERE id = ${id}`
 
     console.log(sql);
 
@@ -74,6 +76,18 @@ app.get('/res/:id', (req, res) => {
     });
 })
 
-function getRestaurants() {
+app.get('/cities', (req, res) => {
+    let id = req.params.id
+    sql = `SELECT DISTINCT city FROM 'restaurant_table' ORDER BY city ASC`
 
-}
+    console.log(sql);
+
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+
+
+        res.send({cities: rows.map(c => c.city)})
+    });
+})
