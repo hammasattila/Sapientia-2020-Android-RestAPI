@@ -77,8 +77,26 @@ WHERE id = ${id}`
     });
 })
 
+app.get('/countries', (req, res) => {
+    sql = `SELECT DISTINCT country FROM 'restaurant_table' ORDER BY country ASC`
+
+    console.log(sql);
+
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+
+
+        res.send({
+            count: rows.length,
+            countries: rows.map(c => c.country)
+        })
+        res.end()
+    })
+})
+
 app.get('/cities', (req, res) => {
-    let id = req.params.id
     sql = `SELECT DISTINCT city FROM 'restaurant_table' ORDER BY city ASC`
 
     console.log(sql);
@@ -89,7 +107,7 @@ app.get('/cities', (req, res) => {
         }
 
 
-        res.send({cities: rows.map(c => c.city)})
+        res.send({ cities: rows.map(c => c.city) })
         res.end()
     });
 })
