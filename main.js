@@ -26,8 +26,8 @@ app.get('/restaurants', (req, res) => {
     if (req.query.address) q.push(`address LIKE "${req.query.address}"`)
     if (req.query.name) q.push(`name LIKE "${req.query.name}"`)
     if (req.query.price) q.push(`price = "${req.query.price}"`)
-    let page = req.query.page ? req.query.name : 1
-    let perPage = req.query.per_page ? req.query.name : 25
+    let page = req.query.page ? req.query.page : 1
+    let perPage = req.query.per_page ? req.query.per_page : 25
 
     let qq = ""
     for (const [i, it] of q.entries()) {
