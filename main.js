@@ -14,6 +14,7 @@ let sql = `SELECT * FROM 'restaurant_table'`;
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
+    res.end()
 })
 
 app.get('/restaurants', (req, res) => {
@@ -53,10 +54,9 @@ OFFSET ${(page - 1) * perPage}`
             per_page: perPage,
             restaurants: rows
         })
+        res.end()
     });
 })
-
-
 
 app.get('/restaurants/:id', (req, res) => {
     let id = req.params.id
@@ -73,6 +73,7 @@ WHERE id = ${id}`
 
 
         res.send(rows[0] ? rows[0] : {})
+        res.end()
     });
 })
 
@@ -89,5 +90,6 @@ app.get('/cities', (req, res) => {
 
 
         res.send({cities: rows.map(c => c.city)})
+        res.end()
     });
 })
