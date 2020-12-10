@@ -34,11 +34,7 @@ app.get('/restaurants', (req, res) => {
         qq += i ? ` AND ${it}` : ` ${it}`
     }
 
-    const sql = `
-SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url
-FROM restaurant_table ${q.length ? "WHERE" : ""} ${qq}
-LIMIT ${perPage}
-OFFSET ${(page - 1) * perPage}`
+    const sql = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM restaurant_table ${q.length ? "WHERE" : ""} ${qq} LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
 
     console.log(sql);
 
