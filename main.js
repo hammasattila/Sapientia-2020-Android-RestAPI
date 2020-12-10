@@ -44,7 +44,16 @@ OFFSET ${(page - 1) * perPage}`
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            throw err;
+            console.err(err)
+
+            res.send({
+                total_entries: 0,
+                page: 1,
+                per_page: perPage,
+                restaurants: [{name: `Your query: ${req.url}. Something is wrong with your parameters, or maybe it just a bug...`}]
+            })
+
+            return
         }
 
 
@@ -60,15 +69,17 @@ OFFSET ${(page - 1) * perPage}`
 
 app.get('/restaurants/:id', (req, res) => {
     let id = req.params.id
-    sql = `
-SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM 'restaurant_table'
-WHERE id = ${id}`
+    sql = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM 'restaurant_table' WHERE id = ${id}`
 
     console.log(sql);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            throw err;
+            console.error("ERROR", req.url, sql, err)
+
+            res.send({name: `Your query: ${req.url}. "${id}" is not a valid id... Maybe you wanted to send as a Query instead of Param? Try something like: fun get(@Query("param_name") ...)`})
+
+            return
         }
 
 
@@ -84,9 +95,9 @@ app.get('/countries', (req, res) => {
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            throw err;
+            console.error(req.url, sql, err)
+            return
         }
-
 
         res.send({
             count: rows.length,
@@ -103,7 +114,8 @@ app.get('/cities', (req, res) => {
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            throw err;
+            console.error(req.url, sql, err)
+            return
         }
 
 
