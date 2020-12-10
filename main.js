@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 8080
+const port = 6969
 const sqlite3 = require('sqlite3').verbose();
 
 app.listen(port, () => {
