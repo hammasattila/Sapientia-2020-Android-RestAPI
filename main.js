@@ -124,7 +124,7 @@ app.get('/states', (req, res) => {
 
         res.send({
             count: rows.length,
-            countries: rows.map(c => c.state)
+            states: rows.map(c => c.state)
         })
         res.end()
     })
