@@ -41,7 +41,7 @@ app.get('/restaurants', (req, res) => {
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.err("ERROR", req.url, sql, err)
+            console.error("ERROR", req.url, sql, err)
 
             res.send({
                 total_entries: 0,
@@ -81,7 +81,7 @@ app.get('/restaurants/:id', (req, res) => {
         if (err) {
             console.error("ERROR", req.url, sql, err)
 
-            res.send({name: `Your query: ${req.url}. "${id}" is not a valid id... Maybe you wanted to send as a Query instead of Param? Try something like: fun get(@Query("param_name") ...)`})
+            res.send({restaurants: [{name: `Your query: ${req.url}. "${id}" is not a valid id... Maybe you wanted to send as a Query instead of Param? Try something like: fun get(@Query("param_name") ...)`}]})
 
             return
         }
