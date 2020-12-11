@@ -111,6 +111,25 @@ app.get('/countries', (req, res) => {
     })
 })
 
+app.get('/states', (req, res) => {
+    sql = `SELECT DISTINCT state FROM 'restaurant_table' ORDER BY state ASC`
+
+    console.log(sql);
+
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            console.error(req.url, sql, err)
+            return
+        }
+
+        res.send({
+            count: rows.length,
+            countries: rows.map(c => c.state)
+        })
+        res.end()
+    })
+})
+
 app.get('/cities', (req, res) => {
     sql = `SELECT DISTINCT city FROM 'restaurant_table' ORDER BY city ASC`
 
