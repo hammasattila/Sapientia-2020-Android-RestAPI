@@ -10,7 +10,7 @@ app.listen(port, () => {
 // open the database
 let db = new sqlite3.Database('./data.sql');
 
-let sql = `SELECT * FROM 'restaurant_table'`;
+const projection = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url`;
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
@@ -34,17 +34,18 @@ app.get('/restaurants', (req, res) => {
         qq += i ? ` AND ${it}` : ` ${it}`
     }
 
-    const sql = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM restaurant_table ${q.length ? "WHERE" : ""} ${qq} LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
+    const conditions = `${q.length ? "WHERE" : ""} ${qq}`
+    const sql = `${projection} FROM 'restaurant_table' ${conditions}  LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
 
     console.log(sql);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.err(err)
+            console.err("ERROR", req.url, sql, err)
 
             res.send({
                 total_entries: 0,
-                page: 1,
+                page: page,
                 per_page: perPage,
                 restaurants: [{name: `Your query: ${req.url}. Something is wrong with your parameters, or maybe it just a bug...`}]
             })
@@ -52,20 +53,27 @@ app.get('/restaurants', (req, res) => {
             return
         }
 
+        db.all(`SELECT COUNT(*) as count FROM 'restaurant_table' ${conditions}`, [], (err, count) => {
+            if (err) {
+                console.err(err)
+    
+                return
+            }
 
-        res.send({
-            total_entries: 0,
-            page: 1,
-            per_page: perPage,
-            restaurants: rows
+            res.send({
+                total_entries: count[0].count,
+                page: page,
+                per_page: perPage,
+                restaurants: rows
+            })
+            res.end()
         })
-        res.end()
     });
 })
 
 app.get('/restaurants/:id', (req, res) => {
     let id = req.params.id
-    sql = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url FROM 'restaurant_table' WHERE id = ${id}`
+    sql = `${projection} FROM 'restaurant_table' WHERE id = ${id}`
 
     console.log(sql);
 
@@ -119,3 +127,4 @@ app.get('/cities', (req, res) => {
         res.end()
     });
 })
+
