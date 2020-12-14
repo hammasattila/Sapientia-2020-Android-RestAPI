@@ -1,4 +1,5 @@
 const express = require('express')
+var path = require('path');
 const app = express()
 const port = 6969
 const sqlite3 = require('sqlite3').verbose();
@@ -13,8 +14,7 @@ let db = new sqlite3.Database('./data.sql');
 const projection = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url`;
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
-    res.end()
+    res.sendFile(path.join(__dirname + '/root.html'))
 })
 
 app.get('/restaurants', (req, res) => {
