@@ -33,17 +33,17 @@ app.get('/restaurants', (req, res) => {
 
     let qq = ""
     for (const [i, it] of q.entries()) {
-        qq += i ? ` AND ${it}` : ` ${it}`
+        qq += i ? ` AND ${it}` : `${it}`
     }
 
     const conditions = `${q.length ? "WHERE" : ""} ${qq}`
-    const sql = `${projection} FROM 'restaurant_table' ${conditions}  LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
+    const sql = `${projection} FROM 'restaurant_table' ${conditions} LIMIT ${perPage} OFFSET ${(page - 1) * perPage}`
 
-    console.log(sql);
+    console.log(`[${new Date().toLocaleString()}]:${sql.substr(projection.length)}`);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.error("ERROR", req.url, sql, err)
+            console.error(`[${new Date().toLocaleString()}] ERROR`, req.url, sql, err);
 
             res.send({
                 total_entries: 0,
@@ -57,7 +57,7 @@ app.get('/restaurants', (req, res) => {
 
         db.all(`SELECT COUNT(*) as count FROM 'restaurant_table' ${conditions}`, [], (err, count) => {
             if (err) {
-                console.err(err)
+                    console.error(err);
     
                 return
             }
@@ -75,13 +75,13 @@ app.get('/restaurants', (req, res) => {
 
 app.get('/restaurants/:id', (req, res) => {
     let id = req.params.id
-    sql = `${projection} FROM 'restaurant_table' WHERE id = ${id}`
+    const sql = `${projection} FROM 'restaurant_table' WHERE id = ${id}`
 
-    console.log(sql);
+    console.log(`[${new Date().toLocaleString()}]:${sql.substr(projection.length)}`);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.error("ERROR", req.url, sql, err)
+            console.error(`[${new Date().toLocaleString()}] ERROR`, req.url, sql, err);
 
             res.send({restaurants: [{name: `Your query: ${req.url}. "${id}" is not a valid id... Maybe you wanted to send as a Query instead of Param? Try something like: fun get(@Query("param_name") ...)`}]})
 
@@ -97,11 +97,11 @@ app.get('/restaurants/:id', (req, res) => {
 app.get('/countries', (req, res) => {
     sql = `SELECT DISTINCT country FROM 'restaurant_table' ORDER BY country ASC`
 
-    console.log(sql);
+    console.log(`[${new Date().toLocaleString()}]: ${sql}`);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.error(req.url, sql, err)
+            console.error(req.url, sql, err);
             return
         }
 
@@ -116,11 +116,11 @@ app.get('/countries', (req, res) => {
 app.get('/states', (req, res) => {
     sql = `SELECT DISTINCT state FROM 'restaurant_table' ORDER BY state ASC`
 
-    console.log(sql);
+    console.log(`[${new Date().toLocaleString()}]: ${sql}`);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.error(req.url, sql, err)
+            console.error(req.url, sql, err);
             return
         }
 
@@ -135,11 +135,11 @@ app.get('/states', (req, res) => {
 app.get('/cities', (req, res) => {
     sql = `SELECT DISTINCT city FROM 'restaurant_table' ORDER BY city ASC`
 
-    console.log(sql);
+    console.log(`[${new Date().toLocaleString()}]: ${sql}`);
 
     db.all(sql, [], (err, rows) => {
         if (err) {
-            console.error(req.url, sql, err)
+            console.error(req.url, sql, err);
             return
         }
 
