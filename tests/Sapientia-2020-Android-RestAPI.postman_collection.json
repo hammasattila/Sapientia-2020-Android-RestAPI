@@ -1,0 +1,706 @@
+{
+	"info": {
+		"_postman_id": "e4b5f285-516b-4355-bc58-5aa1b617cb07",
+		"name": "Sapientia-Android2020-RestAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Basic",
+			"item": [
+				{
+					"name": "Base url",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('The Base URL works', () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restaurant",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('id', 255);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var id = pm.collectionVariables.set('id');",
+									"",
+									"pm.test(`Can acces id: ${id} resource`, () => {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants/{{id}}",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "List",
+			"item": [
+				{
+					"name": "Restaurants list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('Restaurant lis respons.', () => {",
+									"    ",
+									"    pm.expect(pm.response.code, \"Status code is not 200.\").to.eql(200);",
+									"    pm.expect(pm.response, \"Response dose not contain a body.\").to.be.withBody;",
+									"    pm.expect(pm.response, \"Response is not in a JSON format.\").to.be.json;",
+									"    for (it of ['total_entries', 'page', 'per_page', 'restaurants']) {",
+									"        pm.expect(responseJson, `Response json dose not have '${it}' property.`).to.have.property(it);",
+									"    }",
+									"    pm.expect(responseJson['total_entries'] > 0, `Total enteries shuld be more than 0.`).to.be.ok;",
+									"    pm.expect(responseJson['page'], `Page shuld be 1.`).to.equal(1);",
+									"    pm.expect(responseJson['restaurants'].length, `Totsl enteries shuld be more than 0.`).to.equal(Math.min(responseJson['per_page'], responseJson['total_entries']));",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restaurants list filter",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"var countries = pm.environment.get('countries');",
+									"if ((countries && countries.length)) {",
+									"    postman.setNextRequest('Restaurants list filter');",
+									"} else {",
+									"    postman.setNextRequest();",
+									"}",
+									"",
+									"var country = pm.environment.get('country');",
+									"var city = pm.environment.get('city');",
+									"var price = pm.environment.get('price');",
+									"var page = pm.environment.get('page');",
+									"",
+									"pm.test('Simple restaurant list url works.', () => {",
+									"    pm.expect(pm.response.code, \"Status code is not 200.\").to.eql(200);",
+									"});",
+									"",
+									"pm.test('Simple restaurant list url returns json.', () => {",
+									"    pm.expect(pm.response).to.be.ok;",
+									"    pm.expect(pm.response, \"Response dose not contain a body.\").to.be.withBody;",
+									"    pm.expect(pm.response, \"Response is not in a JSON format.\").to.be.json;",
+									"});",
+									"",
+									"pm.test('Simple restaurant list url returns correct json schema.', () => {",
+									"    const responseJson = pm.response.json();",
+									"    for (it of ['total_entries', 'page', 'per_page', 'restaurants']) {",
+									"        pm.expect(responseJson, `Response json dose not have '${it}' property.`).to.have.property(it);",
+									"    }",
+									"});",
+									"",
+									"pm.test('Simple restaurant list url returns logicaly correct data.', () => {",
+									"    const responseJson = pm.response.json();",
+									"",
+									"    if (page && 0 < page) {",
+									"        pm.expect(responseJson['page'], `Page shuld be ${page}.`).to.equal(page);",
+									"    } else {",
+									"        pm.expect(responseJson['page'], `Page shuld be 1.`).to.equal(1);",
+									"        page = 1;",
+									"    }",
+									"",
+									"    const n = Math.min(responseJson['per_page'], Math.max(0, responseJson['total_entries'] - responseJson['per_page'] * (page - 1)));",
+									"    pm.expect(responseJson['restaurants'].length, `Number of restaurants shuld be ${n}.`).to.equal(n);",
+									"",
+									"    for (restaurant of responseJson['restaurants']) {",
+									"        if (country) {",
+									"            pm.expect(restaurant['country'], `Country of item ${restaurant['id']} should be ${country}`).to.equal(country);",
+									"        }",
+									"        if (city) {",
+									"            pm.expect(restaurant['city'], `City of item ${restaurant['id']} should be ${city}`).to.equal(city);",
+									"        }",
+									"        if (price) {",
+									"            pm.expect(restaurant['price'], `Price of item ${restaurant['id']} should be ${price}`).to.equal(price);",
+									"        }",
+									"    }",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('country', 'RO');",
+									"pm.collectionVariables.set('city', 'Brașov');",
+									"pm.collectionVariables.set('price', 1);",
+									"pm.collectionVariables.set('page', 1);",
+									"",
+									"var countries = pm.environment.get('countries');",
+									"var cities = pm.environment.get('cities');",
+									"var prices = pm.environment.get('prices');",
+									"var pages = pm.environment.get('pages');",
+									"",
+									"",
+									"if (!countries || !countries.length) {",
+									"    countries = ['RO', 'US'];",
+									"    pm.environment.set('countries', countries);",
+									"}",
+									"if (!cities || !cities.length) {",
+									"    var country = countries.shift();",
+									"    pm.environment.set('country', country);",
+									"    pm.environment.set('countries', countries);",
+									"",
+									"    cities = ['Târgu Mureș', 'Jackson Hole'];",
+									"    pm.environment.set('cities', cities);",
+									"}",
+									"if (!prices || !prices.length) {",
+									"    var city = cities.shift();",
+									"    pm.environment.set('city', city);",
+									"    pm.environment.set('cities', cities);",
+									"",
+									"    prices = [1, 3];",
+									"    pm.environment.set('prices', prices);",
+									"}",
+									"if (!pages || !pages.length) {",
+									"    var price = prices.shift();",
+									"    pm.environment.set('price', price);",
+									"    pm.environment.set('prices', prices);",
+									"",
+									"    pages = [1, 3];",
+									"    pm.environment.set('pages', pages);",
+									"}",
+									"var page = pages.shift();",
+									"pm.environment.set('page', page);",
+									"pm.environment.set('pages', pages);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants?country={{country}}&city={{city}}&price={{price}}&page={{page}}",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "{{country}}",
+									"description": "Country code for filtering."
+								},
+								{
+									"key": "city",
+									"value": "{{city}}"
+								},
+								{
+									"key": "price",
+									"value": "{{price}}"
+								},
+								{
+									"key": "page",
+									"value": "{{page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Edge cases",
+			"item": [
+				{
+					"name": "Sql injection",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('Sql injection', () => {",
+									"    pm.expect(responseJson).to.deep.equal({",
+									"        total_entries: 0,",
+									"        \"page\": 1,",
+									"        \"per_page\": \"100\",",
+									"        \"restaurants\": []",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants?price=price&per_page=100",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "price",
+									"value": "price"
+								},
+								{
+									"key": "per_page",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Destructive Sql injection",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var prices = pm.environment.get('prices');",
+									"",
+									"if (!prices || !prices.length) {",
+									"    prices = ['price; drop table \\'restaurants_table\\'; --'];",
+									"}",
+									"",
+									"var price = prices.shift();",
+									"pm.environment.set('price', price);",
+									"pm.environment.set('prices', prices);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('Sql injection', () => {",
+									"    pm.expect(responseJson).to.deep.equal({",
+									"        total_entries: 0,",
+									"        \"page\": 1,",
+									"        \"per_page\": \"100\",",
+									"        \"restaurants\": []",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants?price={{price}}&per_page=100",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "price",
+									"value": "{{price}}"
+								},
+								{
+									"key": "per_page",
+									"value": "100"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Data after SQL Injection",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('No data loss.', () => {",
+									"    ",
+									"    pm.expect(pm.response.code, \"Status code is not 200.\").to.eql(200);",
+									"    pm.expect(pm.response, \"Response dose not contain a body.\").to.be.withBody;",
+									"    pm.expect(pm.response, \"Response is not in a JSON format.\").to.be.json;",
+									"    for (it of ['total_entries', 'page', 'per_page', 'restaurants']) {",
+									"        pm.expect(responseJson, `Response json dose not have '${it}' property.`).to.have.property(it);",
+									"    }",
+									"    pm.expect(responseJson['total_entries'] > 0, `Total enteries shuld be more than 0.`).to.be.ok;",
+									"    pm.expect(responseJson['page'], `Page shuld be 1.`).to.equal(1);",
+									"    pm.expect(responseJson['restaurants'].length, `Totsl enteries shuld be more than 0.`).to.equal(Math.min(responseJson['per_page'], responseJson['total_entries']));",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inexistent id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('Inexistent id.', () => {",
+									"    pm.expect(responseJson, 'The json object should be empty.').to.deep.equal({});",
+									"    pm.expect(pm.response.code, \"Response should be not found (404).\").to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants/254",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants",
+								"254"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Not number id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const responseJson = pm.response.json();",
+									"",
+									"pm.test('Inexistent id.', () => {",
+									"    pm.expect(responseJson, 'The json object should be empty.').to.deep.equal({});",
+									"    pm.expect(pm.response.code, \"Response should be not found (404).\").to.eql(404);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants/{{$randomUUID}}",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants",
+								"{{$randomUUID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inexistent property",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Filtering should fail', () => {",
+									"    pm.response.to.not.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants?email=example@example.com",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "example@example.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Performance",
+			"item": [
+				{
+					"name": "Performance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"var perPages = pm.environment.get('per_pages');",
+									"if ((perPages && perPages.length)) {",
+									"    postman.setNextRequest('Performance');",
+									"} else {",
+									"    postman.setNextRequest();",
+									"}",
+									"",
+									"for (limit of [2000, 1000, 500]) {",
+									"    pm.test(`Performance ${limit}ms limit.`, () => {",
+									"        pm.expect(pm.response.responseTime, `Response time is slower then ${limit}!`).to.be.lessThan(limit);",
+									"    })",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set('per_page', 25);",
+									"",
+									"var perPages = pm.environment.get('per_pages');",
+									"if (!perPages || !perPages.length) {",
+									"    perPages = [5,10,25,50,100,250,500,1000];",
+									"    pm.environment.set('per_pages', perPages);",
+									"}",
+									"",
+									"var perPage = perPages.shift();",
+									"pm.environment.set('per_page', perPage);",
+									"pm.environment.set('per_pages', perPages);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://ratpark-api.imok.space/restaurants?per_page={{per_page}}",
+							"protocol": "https",
+							"host": [
+								"ratpark-api",
+								"imok",
+								"space"
+							],
+							"path": [
+								"restaurants"
+							],
+							"query": [
+								{
+									"key": "per_page",
+									"value": "{{per_page}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "country",
+			"value": "RO"
+		},
+		{
+			"key": "city",
+			"value": "Brașov"
+		},
+		{
+			"key": "price",
+			"value": 1
+		},
+		{
+			"key": "page",
+			"value": 1
+		},
+		{
+			"key": "id",
+			"value": null
+		},
+		{
+			"key": "per_page",
+			"value": 25
+		}
+	]
+}

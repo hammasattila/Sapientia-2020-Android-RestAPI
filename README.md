@@ -1,6 +1,6 @@
-# Sapientia-Android2020-RestAPI
+# Sapientia-2020-Android-RestAPI
 
-This project was a replacement for [OpenTableAPI](https://github.com/sosedoff/opentable) during the development of [Android course project](https://github.com/hammasattila/Sapientia-Android2020-Project). It is hosted on one of the subdomains at [Imok](https://imok.biz/).
+This project was a replacement for [OpenTableAPI](https://github.com/sosedoff/opentable) during the development of [Android course project](https://github.com/hammasattila/Sapientia-2020-Android-Project). It is hosted on one of the subdomains at [Imok](https://imok.biz/).
 
 ## 1. Overview
 

@@ -4,12 +4,16 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./main.js",
+    "test": "node ./tests/postman.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "sqlite3": "^5.0.0"
+  },
+  "devDependencies": {
+    "newman": "^5.2.2"
   }
 }

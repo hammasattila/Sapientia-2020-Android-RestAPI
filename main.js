@@ -9,12 +9,12 @@ app.listen(port, () => {
 })
 
 // open the database
-let db = new sqlite3.Database('./data.sql');
+let db = new sqlite3.Database('data/data.db');
 
 const projection = `SELECT id, name, address, city, state, area, postalCode as postal_code, country, phone, lat, lng, price, urlReserve as reserve_url, urlMobileReserve as mobile_reserve_url, urlImage as image_url`;
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/root.html'))
+    res.sendFile(path.join(__dirname + '/www/root.html'))
 })
 
 // country = COALESCE(:country, country) AND state LIKE COALESCE(:state, state) AND INSTR(COALESCE(:city, city), city) AND INSTR(postalCode, COALESCE(:zip, postalCode)) AND INSTR(address, COALESCE(:address, address)) AND INSTR(name, COALESCE(:name, name))
@@ -23,10 +23,10 @@ app.get('/restaurants', (req, res) => {
     let q = []
     if (req.query.country) q.push(`country = "${req.query.country}"`)
     if (req.query.state) q.push(`state = "${req.query.state}"`)
-    if (req.query.city) q.push(`INSTR(UPPER(city) , UPPER("${req.query.city}"))`)
-    if (req.query.postal_code) q.push(`INSTR(UPPER(postalCode) , UPPER("${req.query.postal_code}"))`)
-    if (req.query.address) q.push(`INSTR(UPPER(address) , UPPER("${req.query.address}"))`)
-    if (req.query.name) q.push(`INSTR(UPPER(name) , UPPER("${req.query.name}"))`)
+    if (req.query.city) q.push(`INSTR(UPPER(city), UPPER("${req.query.city}"))`)
+    if (req.query.postal_code) q.push(`INSTR(UPPER(postalCode), UPPER("${req.query.postal_code}"))`)
+    if (req.query.address) q.push(`INSTR(UPPER(address), UPPER("${req.query.address}"))`)
+    if (req.query.name) q.push(`INSTR(UPPER(name), UPPER("${req.query.name}"))`)
     if (req.query.price) q.push(`price = "${req.query.price}"`)
     let page = req.query.page ? Math.max(req.query.page, 1) : 1
     let perPage = req.query.per_page ? req.query.per_page : 25
